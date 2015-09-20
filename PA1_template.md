@@ -11,7 +11,7 @@ It is now possible to collect a large amount of data about personal movement usi
 
 ### Load
 
-Load the libraries that will be used in the analysis.
+Load the libraries that will be used in the analysis. 
 
 
 ```r
@@ -33,7 +33,7 @@ The analyzed data is from a personal activity monitoring device of an
 anonymous individual. The data set contains the number of steps taken 
 during five minute intervals throughout the day for a period of 
 two months. Missing values from the device are represented by NA values.
-Missing values occur when the device was not on the individual. 
+Missing values may occur when the device was not on the individual or when the device was turned off. 
 
 The columns in the data set are:
 
@@ -43,7 +43,7 @@ The columns in the data set are:
 
 - interval: Identifier for the 5-minute interval in which measurement was taken
 
-There are 17568 obvservations in the data set. 
+There are 17,568 obvservations in the data set. 
 
 
 ```r
@@ -58,9 +58,9 @@ str(data.activity)
 ##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
-### Preprocess
+### Process
 
-The data is preprocessed into a format suitable for analysis. 
+The data is processed into a format suitable for analysis. 
 During the processing phase, the data is modified as follows:
 
 - Column 1 is converted to numeric
@@ -132,7 +132,7 @@ str(data.activity.clean)
 ##  $ datetime: POSIXct, format: "2012-10-02 00:00:00" "2012-10-02 00:05:00" ...
 ```
 
-There are 15264 observations in the clean dataset. 2304 observations with NA values were dropped from the original dataset.
+There are 15,264 observations in the clean dataset. A total of 2,304 observations with NA values were dropped from the original dataset.
 
 ## Analyzing the data
 
@@ -190,7 +190,7 @@ on the clean dataset with no NA values.
 analysis.meanSteps <- mean(analysis.stepsPerDay$stepsPerDay)
 analysis.medianSteps <- median(analysis.stepsPerDay$stepsPerDay)
 ```
-The mean number of steps per day is 10766 and the median number of steps per day is 10765
+The mean number of steps per day is 10,766 and the median number of steps per day is 10,765
 
 
 ### What is the average daily activity pattern?
@@ -221,7 +221,8 @@ ggplot(data=analysis.stepsPerInterval, aes(x=datetime, y=meanStepsPerInterval,gr
     geom_hline(yintercept=mean(data.activity.clean$steps),col="red") +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     scale_x_datetime(breaks = date_breaks("1 hour"),
-                     labels = date_format("%H:%M"))
+                     labels = date_format("%H:%M")) +
+    labs(title="Time Series of Personal Activity Data\nOne Individual, 1 Oct 2012 - 30 Nov 2012") 
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
@@ -255,7 +256,7 @@ formattedInterval <- sprintf("%d:%d %s",
             iPeriod)
 ```
 
-Then period with the max number of steps is 8:35 AM. This is consistent with what is displayed in the time series chart above.
+Then period with the max number of steps is 8:35 AM. This is consistent with the data displayed in the time series chart above.
 
 ### Inputing missing values
 
@@ -263,7 +264,7 @@ There are a number of days/intervals where there are missing values (coded as NA
 
 #### Total number of missing values
 
-There are 2304 observations with missing values in the initial dataset. 
+There are 2,304 observations with missing values in the initial dataset. 
 
 ```r
 NROW(data.activity[is.na(data.activity[,1]),])
@@ -293,7 +294,7 @@ for (i in seq(from=1, to=nrow(data.complete))) {
 }
 ```
 
-To confirm, the dataset now has 0 observations with missing values. 
+To confirm, the new dataset now has 0 observations with missing values. 
 
 
 ```r
@@ -306,7 +307,7 @@ NROW(data.activity[is.na(data.complete[,1]),])
 
 #### Dataset with missing values filled in
 
-A new dataset was created, above, that is equal to the original dataset but with the missing data filled in.
+A new dataset was created (above) that is equal to the original dataset but with the missing data filled in. The new dataset can be compared to data.activity, shown previously in the Process section of this report, to compare the filled in NA values.
 
 
 ```r
@@ -325,10 +326,11 @@ head(data.complete)
 
 #### Histogram
 
-A new histogram of the dataset without mission values was created. The historgram is of the total number of steps taken each day. 
+A histogram of the dataset without missing values was created. The historgram is of the total number of steps taken each day. The same histogram bin width was used as in the previous historgram.
 
 
 ```r
+# Calculate the sum of steps each day
 analysis.stepsPerDay2 <- ddply(data.complete, .(date), summarize,
                               stepsPerDay = sum(steps))
 
@@ -347,14 +349,14 @@ ggplot(analysis.stepsPerDay2, aes(analysis.stepsPerDay2$steps)) +
 The histogram looks like the one presented in the previous section of this
 report. 
 
-Next, we look at the mean and media of the new completed dataset.
+Next, the mean and media of the completed dataset are computed.
 
 
 ```r
 analysis.meanSteps <- mean(analysis.stepsPerDay2$stepsPerDay)
 analysis.medianSteps <- median(analysis.stepsPerDay2$stepsPerDay)
 ```
-The mean number of steps per day is 10766 and the median number of steps per day is 10766. The mean is the same as the cleaned dataset and the median has increased by 1. This is not significantly different. Thus the characteristics of the cleaned dataset (above) have been preserved when the NA values were replaced with the mean number of steps per day. The missing values therefore do not have a big impact on the analysis.
+The mean number of steps per day is 10,766 and the median number of steps per day is 10,766. The mean is the same as the cleaned dataset and the median has increased by 1. This is not significantly different. Thus the characteristics of the cleaned dataset (above) have been preserved when the NA values were replaced with the mean number of steps per day. The missing values therefore do not have a big impact on the analysis.
 
 ### Are there differences in activity patterns between weekdays and weekends?
 
@@ -423,7 +425,7 @@ head(data.complete.agg)
 ## 6       25 Weekday 6.295458 2012-10-01 00:25:00
 ```
 
-A panel plot was constructed that contains  a time series plot of the 5-minute interval versus the average number of steps taken, averaged and displayed by type of day. This is similar to the plot above, with the addition of the facet_wrap. 
+A panel plot was constructed that contains a time series plot of the 5-minute interval versus the average number of steps taken, averaged and displayed by type of day. This is similar to the plot above, with the addition of the facet_wrap. 
 
 
 ```r
@@ -435,9 +437,12 @@ ggplot(data=data.complete.agg, aes(x=datetime, y=steps,group=1)) +
     geom_hline(yintercept=mean(data.activity.clean$steps),col="red") +
     theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
     scale_x_datetime(breaks = date_breaks("1 hour"),
-                     labels = date_format("%H:%M"))
+                     labels = date_format("%H:%M")) +
+    labs(title="Time Series of Personal Activity Data\nOne Individual, 1 Oct 2012 - 30 Nov 2012")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-22-1.png) 
 
-The red line on the charts shows the mean number of steps across all days and time intervals. We can see that the weekend activity appears to be higher than the mean. Due to the lower activity in the early morning hours on the weekend, we can hypothesize that the subject sleeps about 90 minutes longer on weekend days. The subject appears to be more active (than weekdays) on the weekends after waking up. 
+The red line on the charts shows the mean number of steps per 5-minute interval across all days and time intervals. The mean is 37 steps. 
+
+We can see that the weekend activity appears to be higher than the mean. We can conclude that the subject appears to be more active during the weekend days. Due to the lower activity in the early morning hours on the weekend, we can hypothesize that the subject sleeps about 90 minutes longer on weekend days. 
