@@ -284,7 +284,7 @@ The mean number of steps per day is `r format(round(analysis.meanSteps,0))` and 
 
 #### Identifying weekend days and weekdays
 
-A new factor variable was created in the complete dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day. The weekdays begin with a 1 (Sunday) and count up to 7 (Saturday).
+A new factor variable was created in the complete dataset with two levels – “Weekday” and “Weekend” indicating whether a given date is a weekday or weekend day. The weekdays begin with a 1 (Sunday) and count up to 7 (Saturday).
 
 ```{r}
 # Loop through the dataset to assign weekday/end
@@ -309,4 +309,33 @@ head(data.complete)
 
 #### Time series Plot
 
+The data was gathered by number of steps per inteval for the two types of days. The datetime column was added for use by charting. 
 
+```{r}
+data.complete.agg <- aggregate(steps ~ interval + daytype, data.complete, mean, na.action = na.omit)
+data.complete.agg[,4] <- data.activity$datetime[1:288]
+names(data.complete.agg)[4] <- "datetime"
+```
+
+The resulting data.frame looks like:
+
+```{r}
+head(data.complete.agg)
+```
+
+A panel plot was constructed that contains  a time series plot of the 5-minute interval versus the average number of steps taken, averaged and displayed by type of day. This is similar to the plot above, with the addition of the facet_wrap. 
+
+```{r}
+ggplot(data=data.complete.agg, aes(x=datetime, y=steps,group=1)) +  
+    geom_line(color="dark grey") +
+    geom_point() +
+    facet_wrap(~ daytype, nrow=2, ncol=1) +
+    xlab("Time, 5-min Period Start") + ylab("Mean Steps") + 
+    geom_hline(yintercept=mean(data.activity.clean$steps),col="red") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+    scale_x_datetime(breaks = date_breaks("1 hour"),
+                     labels = date_format("%H:%M"))
+
+```
+
+The red line on the charts shows the mean number of steps across all days and time intervals. We can see that the weekend activity appears to be higher than the mean. Due to the lower activity in the early morning hours on the weekend, we can hypothesize that the subject sleeps about 90 minutes longer on weekend days. The subject appears to be more active (than weekdays) on the weekends after waking up. 
