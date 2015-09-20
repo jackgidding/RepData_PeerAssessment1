@@ -284,6 +284,28 @@ The mean number of steps per day is `r format(round(analysis.meanSteps,0))` and 
 
 #### Identifying weekend days and weekdays
 
+A new factor variable was created in the complete dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day. The weekdays begin with a 1 (Sunday) and count up to 7 (Saturday).
+
+```{r}
+# Loop through the dataset to assign weekday/end
+for (i in seq(from=1, to=nrow(data.complete))) {
+        theday <- wday(data.complete[i,4])
+        if (theday > 1 & theday<7) {
+            data.complete[i,5] <- "Weekday"
+        } else {
+            data.complete[i,5] <- "Weekend"
+        }
+}
+# Name the column and turn it into a factor
+names(data.complete)[5] <- "daytype"
+data.complete$daytype <- as.factor(data.complete$daytype)
+```
+
+The resulting dataset with the new daytype factor variable looks like:
+
+```{r}
+head(data.complete)
+```
 
 #### Time series Plot
 
